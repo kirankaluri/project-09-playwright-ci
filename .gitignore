@@ -1,8 +1,24 @@
-
-# Playwright
+# Dependencies
 node_modules/
+
+# Playwright generated reports and results
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+/docker-results/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs
+*.log
+
+# OS/editor files
+.DS_Store
+.vscode/
