@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -6,41 +7,40 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = 'project-09-playwright:v1'
-        PROJECT_DIR = '/home/kiran-personal/Desktop/project-09'
+        IMAGE_NAME = "project-09-playwright:${BUILD_NUMBER}"
     }
 
     stages {
         stage('Checkout / Workspace Check') {
             steps {
                 sh '''
-                    echo "Checking Project 09 files..."
-                    test -f "$PROJECT_DIR/Dockerfile"
-                    test -f "$PROJECT_DIR/package.json"
-                    test -f "$PROJECT_DIR/playwright.config.ts"
-                    echo "Project files found."
+                    echo "Checking GitHub checkout..."
+                    test -f Dockerfile
+                    test -f package.json
+                    test -f package-lock.json
+                    test -f playwright.config.ts
+                    test -d tests
+                    echo "Project files found in Jenkins workspace."
+                    echo "Workspace: $WORKSPACE"
                 '''
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh '''
-                    cd "$PROJECT_DIR"
-                    docker build -t "$IMAGE_NAME" .
-                '''
+                sh 'docker build -t "$IMAGE_NAME" .'
             }
         }
 
         stage('Run Playwright Tests') {
             steps {
                 sh '''
-                    cd "$PROJECT_DIR"
                     mkdir -p docker-results playwright-report
+
                     docker run --rm --init --ipc=host \
                       -e CI=true \
-                      -v "$PROJECT_DIR/docker-results:/app/test-results" \
-                      -v "$PROJECT_DIR/playwright-report:/app/playwright-report" \
+                      -v "$WORKSPACE/docker-results:/app/test-results" \
+                      -v "$WORKSPACE/playwright-report:/app/playwright-report" \
                       "$IMAGE_NAME"
                 '''
             }
@@ -66,3 +66,4 @@ pipeline {
         }
     }
 }
+
